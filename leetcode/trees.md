@@ -1,20 +1,6 @@
 # Problems
-## 1.) Remove vowels from a string
-<details>
-<summary>Click here to see code</summary>
 
-```python
-def removeVowels(input):
-	result = ''
-	for character in input:
-		if character not in "aeiou":
-			result = result + character
-	return result
-```
-
-</details>  
-
-## 2.) Post Order traversal of a binary tree
+## 1.) Post Order traversal of a binary tree
 *Hint:* Traverse the root node only after traversing the children using a single stack.
 <details>
 <summary>Click here to see code</summary>
@@ -45,7 +31,7 @@ def removeVowels(input):
 
 </details>  
 
-## 3.) Post Order traversal of a nary tree
+## 2.) Post Order traversal of a nary tree
 *Hint:* Traverse the root node only after traversing the children using a single stack.
 <details>
 <summary>Click here to see code</summary>
@@ -74,6 +60,35 @@ def postorder(self, root: 'Node') -> List[int]:
 
 </details> 
 
+
+## 3.) Pre Order traversal of a n-ary tree
+*Hint:* Traverse the root node only after traversing the children using a single stack.
+<details>
+<summary>Click here to see code</summary>
+
+```python
+def preorder(self, root: 'Node') -> List[int]:
+	result = []
+
+	# Base Case
+	if not root:
+		return result
+
+	stack = [(root, False)]
+	while len(stack) > 0:
+		current, childrenTraversed = stack.pop()
+		if current:
+			if childrenTraversed:
+				result.append(current.val)
+			else:
+				for child in current.children[::-1]:
+					stack.append((child, False))
+				stack.append((current, True))
+
+	return result
+```
+
+</details> 
 
 ## 4.) Pre Order traversal of a n-ary tree
 *Hint:* Traverse the root node only after traversing the children using a single stack.
@@ -104,37 +119,8 @@ def preorder(self, root: 'Node') -> List[int]:
 
 </details> 
 
-## 5.) Pre Order traversal of a n-ary tree
-*Hint:* Traverse the root node only after traversing the children using a single stack.
-<details>
-<summary>Click here to see code</summary>
 
-```python
-def preorder(self, root: 'Node') -> List[int]:
-	result = []
-
-	# Base Case
-	if not root:
-		return result
-
-	stack = [(root, False)]
-	while len(stack) > 0:
-		current, childrenTraversed = stack.pop()
-		if current:
-			if childrenTraversed:
-				result.append(current.val)
-			else:
-				for child in current.children[::-1]:
-					stack.append((child, False))
-				stack.append((current, True))
-
-	return result
-```
-
-</details> 
-
-
-## 6.) Inorder traversal of a binary tree
+## 5.) Inorder traversal of a binary tree
 *Hint:* Traverse the root node only after traversing the left child using a single stack.
 <details>
 <summary>Click here to see code</summary>
@@ -200,7 +186,7 @@ class Solution:
 ```
 </details> 
 
-## 7.) Level traversal of a n-ary tree
+## 6.) Level traversal of a n-ary tree
 *Hint:* Enqueue the children nodes of the current level nodes at each level and add them to the output for each iteration. Use a single queue.
 <details>
 <summary>Click here to see code</summary>
@@ -226,7 +212,7 @@ def levelOrder(self, root: 'Node') -> List[List[int]]:
 </details> 
 
 
-## 8.) Max Depth of a binary tree
+## 7.) Max Depth of a binary tree
 Maximum depth of a node is the length of the longest path between the root node and a leaf node.
 
 *Hint:* MaxDepth = 1 + max(leftMaxDepth, rightMaxDepth)
@@ -253,7 +239,7 @@ def maxDepth(self, root: TreeNode) -> int:
 
 </details> 
 
-## 9.) Min Depth of a binary tree
+## 8.) Min Depth of a binary tree
 Minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
 
 *Hint:* Update minDepth only when the node is a leaf node. Depth = 1 + min(leftMinDepth, rightMinDepth)
@@ -283,7 +269,7 @@ def minDepth(self, root: TreeNode) -> int:
 </details>
 
 
-## 10.) Max Depth of a n-ary tree
+## 9.) Max Depth of a n-ary tree
 The maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
 
 *Hint:* MaxDepth = 1 + max(leftMaxDepth, rightMaxDepth)
@@ -311,7 +297,7 @@ def maxDepth(self, root: 'Node') -> int:
 </details> 
 
 
-## 11.) Check if a binary tree is height-balanced
+## 10.) Check if a binary tree is height-balanced
 A binary tree in which the left and right subtrees of every node differ in height by no more than 1.
 
 *Hint:*
@@ -345,7 +331,7 @@ def isBalanced(self, root: TreeNode) -> bool:
 
 </details> 
 
-## 12.) Same tree
+## 11.) Same tree
 Given two binary trees, write a function to check if they are the same or not.
 
 Two binary trees are considered the same if they are structurally identical and the nodes have the same value.
@@ -409,7 +395,7 @@ def isSameTree(self, p, q):
 ```
 </details> 
 
-## 13.) Leaf-similar trees
+## 12.) Leaf-similar trees
 Two binary trees are considered leaf-similar if their leaf value sequence is the same.
 
 *Hint:*
@@ -444,7 +430,7 @@ class Solution:
 
 </details>
 
-## 14.) Single Element in a Sorted Array
+## 13.) Single Element in a Sorted Array
 You are given a sorted array consisting of only integers where every element appears exactly twice, except for one element which appears exactly once. Find this single element that appears only once.
 
 *Hint:*
@@ -490,7 +476,7 @@ def singleNonDuplicate(self, nums: List[int]) -> int:
 
 </details>
 
-## 15.) Minimum Distance Between BST Nodes
+## 14.) Minimum Distance Between BST Nodes
 Given a Binary Search Tree (BST) with the root node root, return the minimum difference between the values of any two different nodes in the tree.
 
 *Hint:*
@@ -788,7 +774,7 @@ class Solution:
 
 </details>
 
-## 18.) Binary Tree Vertical Order Traversal
+## 19.) Binary Tree Vertical Order Traversal
 Given a binary tree, return the vertical order traversal of its nodes values.
 
 For each node at position (X, Y), its left and right children respectively will be at positions (X-1, Y-1) and (X+1, Y-1).
@@ -841,7 +827,7 @@ class Solution:
 
 </details>
 
-## 19.)  Maximum Width of Binary Tree
+## 20.)  Maximum Width of Binary Tree
 Given a binary tree, write a function to get the maximum width of the given tree. The maximum width of a tree is the maximum width among all levels.
 
 The width of one level is defined as the length between the end-nodes (the leftmost and right most non-null nodes in the level, where the null nodes between the end-nodes are also counted into the length calculation.
@@ -886,6 +872,218 @@ class Solution:
             
             maxWidth = max(maxWidth, rightNodeIndex - leftNodeIndex + 1)
         return maxWidth
+```
+
+</details>
+
+20.) Find Largest Value in Each Tree Row
+find the largest value in each row of a binary tree.
+
+*Hint:*
+* Do level order traversal and for each row find the max element.
+
+[LeetCode link](https://leetcode.com/problems/find-largest-value-in-each-tree-row/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+from collections import deque
+class Solution:
+    def largestValues(self, root: TreeNode) -> List[int]:
+        if not root:
+            return []
+        
+        queue = deque()
+        queue.append(root)
+        
+        result = []
+        while queue:
+            currentLevelLength = len(queue)
+            
+            currentLevelMax = -math.inf
+            for _ in range(currentLevelLength):
+                node = queue.popleft()
+                currentLevelMax = max(currentLevelMax, node.val)
+
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+            result.append(currentLevelMax)
+        
+        return result
+```
+
+</details>
+
+21.) Check Completeness of a Binary Tree
+Given a binary tree, determine if it is a complete binary tree.
+
+*Hint:*
+* Do BFS and verify the property _index(leftChild) = 2*(parentIndex)_ and _index(rightChild) = 2*(parentIndex) + 1_.
+* The property can be verified by by making sure that the nodes visited in the BFS so far equals the index for the node currently processed.
+
+[LeetCode link](https://leetcode.com/problems/check-completeness-of-a-binary-tree/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+    def isCompleteTree(self, root: TreeNode) -> bool:
+        if not root:
+            return True
+        
+        # Perform BFS
+        queue = deque()
+        queue.append((root, 1))
+        totalNodesSoFar = 0
+        
+        while queue:
+            node, index = queue.popleft()
+            totalNodesSoFar += 1
+            
+            if totalNodesSoFar != index:
+                return False
+
+            if node.left:
+                queue.append((node.left, index*2))
+            if node.right:
+                queue.append((node.right, index*2+1))
+
+        return True
+```
+
+</details>
+
+## 21.) Cousins in Binary Tree
+
+In a binary tree, the root node is at depth 0, and children of each depth k node are at depth k+1.
+
+Two nodes of a binary tree are cousins if they have the same depth, but have different parents.
+
+We are given the root of a binary tree with unique values, and the values x and y of two different nodes in the tree.
+
+Return true if and only if the nodes corresponding to the values x and y are cousins.
+
+*Hint:*
+* Do level order traversal and verify the below.
+  * Both nodes are found at the same level.
+  * Both nodes have different parents.
+  * Otherwise, return false.
+
+[LeetCode link](https://leetcode.com/problems/cousins-in-binary-tree/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+from collections import deque
+class Solution:
+    def isCousins(self, root: TreeNode, x: int, y: int) -> bool:
+        if not root:
+            return False
+        
+        queue = deque()
+        queue.append((root, None))
+
+        xFound, yFound = False, False
+        xParent, yParent = None, None
+
+        while queue:
+            currentLevelLength = len(queue)
+            
+            for _ in range(currentLevelLength):
+                node, parent = queue.popleft()
+                if node.val == x:
+                    xFound = True
+                    xParent = parent
+                elif node.val == y:
+                    yFound = True
+                    yParent = parent
+
+                if node.left:
+                    queue.append((node.left, node.val))
+                if node.right:
+                    queue.append((node.right, node.val))
+
+            # If we've found both the nodes, see if their parents are different
+            if xFound and yFound:
+                return xParent != yParent
+            # If only one of the nodes are found, other node exists in a different depth.
+            elif xFound or yFound:
+                return False
+                
+        return False
+
+```
+
+</details>
+
+## 22.) All Nodes Distance K in Binary Tree
+
+We are given a binary tree (with root node root), a target node, and an integer value K.
+
+Return a list of the values of all nodes that have a distance K from the target node.  The answer can be returned in any order.
+
+*Hint:*
+* Mark parents of all nodes and then do a BFS assuming neighbors as __(node.left, node.right, node.parent)__
+
+[LeetCode link](https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+    def distanceK(self, root: TreeNode, target: TreeNode, K: int) -> List[int]:
+        if not root or not target:
+            []
+        
+        # Do DFS to get the target node and to annotate parents of all nodes
+        def dfs(root, parent):
+            if root:
+                root.parent = parent
+                if root.left:
+                    dfs(root.left, root)
+                if root.right:
+                    dfs(root.right, root)
+
+        dfs(root, None)
+        
+        # Do BFS to get the nodes at depth K
+        queue = deque([(target, 0)])
+        visitedSet = set()
+        
+        while queue:
+            if queue[0][1] == K:
+                return [ node.val for node, depth in queue ]
+
+            node, depth = queue.popleft()
+            visitedSet.add(node)
+            
+            for neighbor in (node.left, node.right, node.parent):
+                if neighbor and neighbor not in visitedSet:
+                    visitedSet.add(neighbor)
+                    queue.append((neighbor, depth + 1))
+        
+        return []
+```
+
+</details>
+
+## 22.)
+
+
+*Hint:*
+* 
+
+[LeetCode link](https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+
 ```
 
 </details>

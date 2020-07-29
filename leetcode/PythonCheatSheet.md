@@ -1,7 +1,7 @@
 # Constants
 
-**positive infinity** math.inf or Decimal('Infinity')
-**negative infinity** -math.inf or Decimal('-Infinity')
+1. **positive infinity** math.inf or Decimal('Infinity')
+1. **negative infinity** -math.inf or Decimal('-Infinity')
 
 # Operators
 
@@ -16,7 +16,7 @@ for ch in string:
     print(ch, end=' ')
 
 for i, ch in enumerate(string):
-    print(f"index: (i}, char: {ch}")
+    print(f"index: {i}, char: {ch}")
 ```
 
 - Reverse iterate a string

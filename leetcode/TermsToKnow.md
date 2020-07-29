@@ -40,3 +40,19 @@ Diameter of the example tree above is 8 i.e. between nodes 13 and 19 there are 6
 
 ### Height-Balanced Binary Tree
 A binary tree in which the left and right subtrees of every node differ in height by no more than 1.
+
+### Complete binary tree
+In a complete binary tree every level, except possibly the last, is completely filled, and all nodes in the last level are as far left as possible. It can have between 1 and 2h nodes inclusive at the last level h.
+
+<img src=https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Complete_binary2.svg/220px-Complete_binary2.svg.png />
+
+
+### Full binary tree
+A full binary tree (sometimes referred to as a proper or plane binary tree) is a tree in which every node has either 0 or 2 children.
+
+
+<img src=https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Full_binary.svg/220px-Full_binary.svg.png />
+
+### Perfect Binary Tree
+A perfect binary tree is a binary tree in which all interior nodes have two children and all leaves have the same depth or same level.
+
