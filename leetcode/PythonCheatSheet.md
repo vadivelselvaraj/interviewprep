@@ -50,7 +50,12 @@ for ch in reversed( range( 0, len(string) ) ):
 ```python
 Character.isDigit(ch)
 ```
-
+- Concatenate strings
+```python
+>>> p+="2"
+>>> p
+'1->2'
+```
 
 # List
 - Iterate
@@ -79,6 +84,20 @@ Character.isDigit(ch)
 >>> a = [(2, 1), (0, 3), (0, 2)]
 >>> sorted(a)
 [(0, 2), (0, 3), (2, 1)]
+```
+- Reverse a list
+```python
+>>> for i in reversed(['hai', 'bye', 'cde']):
+...     print(i)
+... 
+cde
+bye
+hai
+```
+- Check if a list is None or has zero elements in it
+```python
+if not aList:
+    ...
 ```
 # Dictionary
 

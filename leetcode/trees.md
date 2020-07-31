@@ -1071,19 +1071,430 @@ Return a list of the values of all nodes that have a distance K from the target 
 
 </details>
 
-## 22.)
+## 23.) Binary Search Tree Iterator
 
+Implement an iterator over a binary search tree (BST). Your iterator will be initialized with the root node of a BST.
 
-*Hint:*
-* 
+Calling next() will return the next smallest number in the BST.
 
-[LeetCode link](https://leetcode.com/problems/all-nodes-distance-k-in-binary-tree/)
+*Note:*
+- next() and hasNext() should run in average O(1) time and uses O(h) memory, where h is the height of the tree.
+- You may assume that next() call will always be valid, that is, there will be at least a next smallest number in the BST when next() is called.
+
+**Hint:**
+* Do controlled DFS. i.e. load up all the left nodes in stack in advance and during each call of the next function.
+
+[LeetCode link](https://leetcode.com/problems/binary-search-tree-iterator/)
 
 <details>
 <summary>Click here to see code</summary>
 
 ```python
+class BSTIterator:
 
+    def __init__(self, root: TreeNode):
+        self.root = root
+        self.stack = []
+        self.traverseLeftNodes(root)
+        
+    def traverseLeftNodes(self, node: TreeNode):
+        while node:
+            self.stack.append(node)
+            node = node.left
+
+    def next(self) -> int:
+        """
+        @return the next smallest number
+        """
+        smallestNode = self.stack.pop()
+        if smallestNode.right:
+            self.traverseLeftNodes(smallestNode.right)
+
+        return smallestNode.val
+        
+
+    def hasNext(self) -> bool:
+        """
+        @return whether we have a next smallest number
+        """
+        return len(self.stack) > 0
+
+
+# Your BSTIterator object will be instantiated and called as such:
+# obj = BSTIterator(root)
+# param_1 = obj.next()
+# param_2 = obj.hasNext()
+```
+
+</details>
+
+Note: Time Complexity of the solution is O(N) at the worst case i.e a skewed tree. But since the requirement is for an average(or amortized) time, this solution would suffice.
+
+
+## 24.) Binary Tree Paths
+
+Given a binary tree, return all root-to-leaf paths.
+
+Note: A leaf is a node with no children.
+
+**Hint:**
+* Do DFS, append each node visited to a path string and finally append the entire path when a leaf node is reached.
+
+[LeetCode link](https://leetcode.com/problems/binary-tree-paths/)
+
+<details>
+<summary>Click here to see code</summary>
+
+## Approach 1: Iteration
+
+```python
+    def binaryTreePaths(self, root: TreeNode) -> List[str]:
+        if not root:
+            return []
+
+        result = []
+        
+        queue = deque([(root, str(root.val))])
+        
+        while queue:
+            node, path = queue.popleft()
+            if node:
+                if not node.left and not node.right:
+                    result.append(path)
+                else:
+                    if node.left:
+                        queue.append((node.left, f"{path}->{node.left.val}"))
+                    if node.right:
+                        queue.append((node.right, f"{path}->{node.right.val}"))
+
+        return result
+```
+
+## Approach 2: Recursion
+
+```python
+    def binaryTreePaths(self, root: TreeNode) -> List[str]:
+        if not root:
+            return []
+
+        result = []
+        def dfs(node: TreeNode, path: str):
+            if node:
+                if not node.left and not node.right:
+                    nonlocal result
+                    result.append(path)
+                elif node.left:
+                    dfs(node.left, f"{path}->{node.left.val}")
+                if node.right:
+                    dfs(node.right, f"{path}->{node.right.val}")
+
+        dfs(root, str(root.val))
+
+        return result
+```
+
+</details>
+
+
+
+## 25.) Binary Tree Maximum Path Sum
+
+Given a non-empty binary tree, find the maximum path sum.
+
+For this problem, a path is defined as any sequence of nodes from some starting node to any node in the tree along the parent-child connections. The path must contain at least one node and does not need to go through the root.
+
+**Hint:**
+* Do a DFS and at each node, return _max( node.val, node.val+max( leftsum, rightSum ) )_.
+* While doing so, also keep track of the maxPathSum so far including the
+
+[LeetCode link](https://leetcode.com/problems/binary-tree-maximum-path-sum/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def maxPathSum(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        
+        maxPathSum = -math.inf
+        def dfs(node: TreeNode):
+            if not node:
+                return 0
+
+            leftSum = dfs(node.left)
+            rightSum = dfs(node.right)
+            
+            nonlocal maxPathSum
+            currentPathSum = max(
+                node.val,
+                node.val + max(leftSum, rightSum)
+            )
+            maxPathSum = max(maxPathSum, currentPathSum, node.val + leftSum + rightSum)
+            
+            return currentPathSum
+            
+                
+        dfs(root)
+        print()
+
+        return maxPathSum
+```
+
+</details>
+
+## 26.) Longest Univalue path
+
+Given a binary tree, find the length of the longest path where each node in the path has the same value. This path may or may not pass through the root.
+
+The length of path between two nodes is represented by the number of edges between them.
+
+**Hint:**
+* Do DFS and increase the path length iff _node.val == node.left.val_ or the converse and _reset it to zero_ otherwise.
+
+[LeetCode link](https://leetcode.com/problems/longest-univalue-path/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+    def longestUnivaluePath(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+
+        longestPath = 0
+        def dfs(node: TreeNode):
+            if not node:
+                return 0
+
+            leftPathLength, rightPathLength = 0, 0
+            if node.left:
+                leftPathLength = dfs(node.left)
+            if node.right:
+                rightPathLength = dfs(node.right)
+
+            nonlocal longestPath
+            # If the nodes are equal, let's increase the path length.
+            # Otherwise, set it to zero.
+            if node.left and node.val == node.left.val:
+                leftPathLength += 1
+            else:
+                leftPathLength = 0
+
+            if node.right and node.val == node.right.val:
+                rightPathLength += 1
+            else:
+                rightPathLength = 0
+            
+            longestPath = max(longestPath, leftPathLength + rightPathLength)
+            
+            return  max(leftPathLength, rightPathLength)
+  
+        dfs(root)
+        return longestPath
+```
+
+</details>
+
+## 27.) Path Sum I
+
+Given a binary tree and a sum, determine if the tree has a root-to-leaf path such that adding up all the values along the path equals the given sum.
+
+Note: A leaf is a node with no children.
+
+**Hint:**
+* Do a DFS; a top down approach, passing down the sum as we recur down the tree and once the leaf node is reached, check if the give sum is reached. If so, return true.
+
+[LeetCode link](https://leetcode.com/problems/path-sum/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def hasPathSum(self, root: TreeNode, sum: int) -> bool:
+                if not root:
+                    return False
+                
+                def _hasPathSum(node: TreeNode, pathSum: int):
+                    if not node:
+                        return False
+
+                    nonlocal sum
+                    if not node.left and not node.right:
+                        if sum == node.val + pathSum:
+                            return True
+
+                    return _hasPathSum(node.left, node.val + pathSum) or _hasPathSum(node.right, node.val + pathSum)
+
+                return _hasPathSum(root, 0)
+```
+
+</details>
+
+
+## 28.) Path Sum II
+
+Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
+
+Note: A leaf is a node with no children.
+
+**Hint:**
+* Do top down traversal via a DFS, recuring down the sum along the way until the intended sum is reached.
+* Note: We should pop a node once all the subtree under the node are traversed.
+* Remember to use _list(pathList)_ to do a deep copy of the _pathList_ so that the `result` i.e. _List[List[int]]_ doesn't carry a pointer to the modified _pathList_.
+
+[LeetCode link](https://leetcode.com/problems/path-sum-ii/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+from copy import deepcopy
+class Solution:
+    def pathSum(self, root: TreeNode, sum: int) -> List[List[int]]:
+        if not root:
+            return []
+        
+        result = []
+        def _pathSum(node: TreeNode, pathSum: int, pathList: List[int]):
+            if not node:
+                return
+
+            currentPathSum = node.val + pathSum
+            pathList.append(node.val)
+            
+            nonlocal sum, result
+            if not node.left and not node.right:
+                if sum == currentPathSum:
+                    result.append(deepcopy(pathList))
+            if node.left:
+                _pathSum(node.left, currentPathSum, pathList)
+            if node.right:
+                _pathSum(node.right, currentPathSum, pathList)
+
+            pathList.pop()
+
+        _pathSum(root, 0, [])
+        return result
+```
+
+</details>
+
+
+## 29.) Path Sum III
+
+You are given a binary tree in which each node contains an integer value.
+
+Find the number of paths that sum to a given value.
+
+The path does not need to start or end at the root or a leaf, but it must go downwards (traveling only from parent nodes to child nodes).
+
+**Hint:**
+* Do top down traversal via a DFS, recuring down the sum along the way until the intended sum is reached.
+* Note: We should pop a node once all the subtree under the node are traversed.
+* Remember to use _list(pathList)_ to do a deep copy of the _pathList_ so that the `result` i.e. _List[List[int]]_ doesn't carry a pointer to the modified _pathList_.
+
+[LeetCode link](https://leetcode.com/problems/path-sum-ii/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def pathSum(self, root: TreeNode, sum: int) -> List[List[int]]:
+        if not root:
+            return []
+        
+        result = []
+        def _pathSum(node: TreeNode, pathSum: int, pathList: List[int]):
+            if not node:
+                return
+
+            currentPathSum = node.val + pathSum
+            pathList.append(node.val)
+            
+            nonlocal sum, result
+            if not node.left and not node.right:
+                if sum == currentPathSum:
+                    result.append(list(pathList))
+            if node.left:
+                _pathSum(node.left, currentPathSum, pathList)
+            if node.right:
+                _pathSum(node.right, currentPathSum, pathList)
+
+            pathList.pop()
+
+        _pathSum(root, 0, [])
+        return result
+```
+
+</details>
+
+
+## 30.) Path Sum IV
+
+Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
+
+Note: A leaf is a node with no children.
+
+**Hint:**
+* Do top down traversal via a DFS, recuring down the sum along the way until the intended sum is reached.
+* Note: We should pop a node once all the subtree under the node are traversed.
+* Remember to use _list(pathList)_ to do a deep copy of the _pathList_ so that the `result` i.e. _List[List[int]]_ doesn't carry a pointer to the modified _pathList_.
+
+[LeetCode link](https://leetcode.com/problems/path-sum-ii/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def pathSum(self, root: TreeNode, sum: int) -> List[List[int]]:
+        if not root:
+            return []
+        
+        result = []
+        def _pathSum(node: TreeNode, pathSum: int, pathList: List[int]):
+            if not node:
+                return
+
+            currentPathSum = node.val + pathSum
+            pathList.append(node.val)
+            
+            nonlocal sum, result
+            if not node.left and not node.right:
+                if sum == currentPathSum:
+                    result.append(list(pathList))
+            if node.left:
+                _pathSum(node.left, currentPathSum, pathList)
+            if node.right:
+                _pathSum(node.right, currentPathSum, pathList)
+
+            pathList.pop()
+
+        _pathSum(root, 0, [])
+        return result
+```
+
+</details>
+
+
+# Template:
+
+## .) 
+
+
+**Hint:**
+* 
+
+[LeetCode link]()
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
 ```
 
 </details>
