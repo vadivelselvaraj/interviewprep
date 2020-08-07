@@ -1391,43 +1391,54 @@ Find the number of paths that sum to a given value.
 
 The path does not need to start or end at the root or a leaf, but it must go downwards (traveling only from parent nodes to child nodes).
 
+**Test Cases to consider**
+- Sum appearing in both the sides of the tree.
+- Sum appearing only in left subtree.
+- Sum appearing only in right subtree.
+- Only one node having the sum.
+
 **Hint:**
 * Do top down traversal via a DFS, recuring down the sum along the way until the intended sum is reached.
-* Note: We should pop a node once all the subtree under the node are traversed.
+* Key Note: We should remove the currentSum once the left and right subtrees are done.
 * Remember to use _list(pathList)_ to do a deep copy of the _pathList_ so that the `result` i.e. _List[List[int]]_ doesn't carry a pointer to the modified _pathList_.
 
-[LeetCode link](https://leetcode.com/problems/path-sum-ii/)
+[LeetCode link](https://leetcode.com/problems/path-sum-iii/)
 
 <details>
 <summary>Click here to see code</summary>
 
 ```python
+from collections import defaultdict
 class Solution:
-    def pathSum(self, root: TreeNode, sum: int) -> List[List[int]]:
+    def pathSum(self, root: TreeNode, sum: int) -> int:
         if not root:
-            return []
+            return 0
         
-        result = []
-        def _pathSum(node: TreeNode, pathSum: int, pathList: List[int]):
+        numberOfPaths, prefixSumMap = 0, defaultdict(int)
+        def countPathSum(node: TreeNode, currentSum: int):
             if not node:
                 return
-
-            currentPathSum = node.val + pathSum
-            pathList.append(node.val)
             
-            nonlocal sum, result
-            if not node.left and not node.right:
-                if sum == currentPathSum:
-                    result.append(list(pathList))
+            currentSum += node.val
+            nonlocal sum, prefixSumMap, numberOfPaths
+            
+            if currentSum == sum:
+                numberOfPaths += 1
+
+            if currentSum - sum in prefixSumMap:
+                numberOfPaths += prefixSumMap[currentSum - sum]
+            
+            prefixSumMap[currentSum] += 1
+
             if node.left:
-                _pathSum(node.left, currentPathSum, pathList)
+                countPathSum(node.left, currentSum)
             if node.right:
-                _pathSum(node.right, currentPathSum, pathList)
+                countPathSum(node.right, currentSum)
+            
+            prefixSumMap[currentSum] -= 1
 
-            pathList.pop()
-
-        _pathSum(root, 0, [])
-        return result
+        countPathSum(root, 0)
+        return numberOfPaths
 ```
 
 </details>
@@ -1435,56 +1446,447 @@ class Solution:
 
 ## 30.) Path Sum IV
 
-Given a binary tree and a sum, find all root-to-leaf paths where each path's sum equals the given sum.
+If the depth of a tree is smaller than 5, then this tree can be represented by a list of three-digits integers.
 
-Note: A leaf is a node with no children.
+For each integer in this list:
+
+The hundreds digit represents the depth D of this node, 1 <= D <= 4.
+The tens digit represents the position P of this node in the level it belongs to, 1 <= P <= 8. The position is the same as that in a full binary tree.
+The units digit represents the value V of this node, 0 <= V <= 9.
+Given a list of ascending three-digits integers representing a binary tree with the depth smaller than 5, you need to return the sum of all paths from the root towards the leaves.
+
+It's guaranteed that the given list represents a valid connected binary tree.
 
 **Hint:**
-* Do top down traversal via a DFS, recuring down the sum along the way until the intended sum is reached.
-* Note: We should pop a node once all the subtree under the node are traversed.
-* Remember to use _list(pathList)_ to do a deep copy of the _pathList_ so that the `result` i.e. _List[List[int]]_ doesn't carry a pointer to the modified _pathList_.
+* Construct a map of { 'depth+pos': node.val } to map the positions and the corresponding value.
+* With the above, the left and right child of a node can be found at _(depth+1, 2xpos-1)_ and _(depth+1, 2xpos)_ respectively.
+* Given these, traverse the nodes via DFS and add the sum.
+* Note: Integer division in python is done via `123//10` and not `123/10`
 
-[LeetCode link](https://leetcode.com/problems/path-sum-ii/)
+[LeetCode link](https://leetcode.com/problems/path-sum-iv/)
 
 <details>
 <summary>Click here to see code</summary>
 
 ```python
 class Solution:
-    def pathSum(self, root: TreeNode, sum: int) -> List[List[int]]:
-        if not root:
-            return []
+    def pathSum(self, nums: List[int]) -> int:
+        if not nums:
+            return 0
         
-        result = []
-        def _pathSum(node: TreeNode, pathSum: int, pathList: List[int]):
-            if not node:
+        sum = 0
+        # Construct a map of { 'depth+pos': node.val }
+        # With this map, a node's left children can be found at (depth+1, 2xpos-1)
+        # and right children at (depth+1, 2xpos)
+        keyToNodeMap = { x//10: x%10 for x in nums }
+        
+        def dfs(nodeKey, sumSoFar):
+            if not nodeKey:
                 return
-
-            currentPathSum = node.val + pathSum
-            pathList.append(node.val)
             
-            nonlocal sum, result
-            if not node.left and not node.right:
-                if sum == currentPathSum:
-                    result.append(list(pathList))
-            if node.left:
-                _pathSum(node.left, currentPathSum, pathList)
-            if node.right:
-                _pathSum(node.right, currentPathSum, pathList)
+            sumSoFar += keyToNodeMap[nodeKey]
+            nodeDepth, nodePos = divmod(nodeKey, 10)
+            leftChildKey = (10 * (nodeDepth + 1)) + (2*nodePos) - 1
+            rightChildKey = leftChildKey + 1
+            
+            nonlocal sum
+            if leftChildKey not in keyToNodeMap and rightChildKey not in keyToNodeMap:
+                sum += sumSoFar
 
-            pathList.pop()
+            if leftChildKey in keyToNodeMap:
+                dfs(leftChildKey, sumSoFar)
+            if rightChildKey in keyToNodeMap:
+                dfs(rightChildKey, sumSoFar)
+            
+            
+        dfs(nums[0]//10, 0)
+        return sum
+```
 
-        _pathSum(root, 0, [])
-        return result
+</details>
+
+## 31.) Construct Binary Tree from Preorder and Inorder Traversal
+
+Given preorder and inorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+**Questions to ask**
+- Duplicates nodes in the tree?
+
+**Testcases to consider**
+
+**Hint:**
+* First element in preorder list is the root.
+* For each iteration, identify the left and right subtrees in the inorder list and set the root's(element currently in the preorder list) children recursively.
+* Note: when the left and right inorder indices match, stop the iteration. Make sure to have a map to lookup the index of a node.
+
+[LeetCode link](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-inorder-traversal)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def buildTree(self, preorder: List[int], inorder: List[int]) -> TreeNode:
+        if not preorder:
+            return
+        
+        nodeToIndexMap = { nodeVal: index for index, nodeVal in enumerate(inorder) }
+        preOrderIndex = 0
+
+        def _buildTree(leftInorderIndex, rightInorderIndex):
+            if leftInorderIndex == rightInorderIndex:
+                return None
+            
+            nonlocal preOrderIndex, nodeToIndexMap
+            root = TreeNode(preorder[preOrderIndex])
+            rootIndex = nodeToIndexMap[preorder[preOrderIndex]]
+            
+            preOrderIndex += 1
+            
+            root.left = _buildTree(leftInorderIndex, rootIndex)
+            root.right = _buildTree(rootIndex + 1, rightInorderIndex)
+
+            return root
+
+        return _buildTree(0, len(inorder))
 ```
 
 </details>
 
 
+## 32.) Construct Binary Tree from Preorder and Inorder Traversal
+
+Given inorder and postorder traversal of a tree, construct the binary tree.
+
+Note:
+You may assume that duplicates do not exist in the tree.
+
+**Questions to ask**
+- Duplicates nodes in the tree?
+
+**Testcases to consider**
+
+**Hint:**
+* Last element in postorder list is the root.
+* For each iteration, identify the left and right subtrees in the inorder list and set the root's(element currently in the postorder list) children recursively.
+* Note:
+  * when the left and right inorder indices match, stop the iteration
+  * Make sure to have a map to lookup the index of a node.
+  * Build right child first before the left child unlike in the preorder and inorder problem.
+
+[LeetCode link](https://leetcode.com/problems/construct-binary-tree-from-inorder-and-postorder-traversal/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        if not postorder:
+            return
+        
+        nodeToIndexMap = { nodeVal: index for index, nodeVal in enumerate(inorder) }
+        postOrderIndex = len(postorder) - 1
+
+        def _buildTree(leftInorderIndex, rightInorderIndex):
+            if leftInorderIndex == rightInorderIndex:
+                return None
+            
+            nonlocal postOrderIndex, nodeToIndexMap
+            root = TreeNode(postorder[postOrderIndex])
+            rootInorderIndex = nodeToIndexMap[ postorder[postOrderIndex] ]
+            
+            postOrderIndex -= 1
+            
+            root.right = _buildTree(rootInorderIndex + 1, rightInorderIndex)
+            root.left = _buildTree(leftInorderIndex, rootInorderIndex)
+
+            return root
+
+        return _buildTree(0, len(inorder))
+```
+
+</details>
+
+## 33.) Construct Binary Tree from String
+
+You need to construct a binary tree from a string consisting of parenthesis and integers.
+
+The whole input represents a binary tree. It contains an integer followed by zero, one or two pairs of parenthesis. The integer represents the root's value and a pair of parenthesis contains a child binary tree with the same structure.
+
+You always start to construct the left child node of the parent first if it exists.
+
+**Questions to ask**
+- Duplicates nodes in the tree?
+
+**Testcases to consider**
+
+**Hint:**
+* Last element in postorder list is the root.
+* For each iteration, identify the left and right subtrees in the inorder list and set the root's(element currently in the postorder list) children recursively.
+* Note:
+  * when the left and right inorder indices match, stop the iteration
+  * Make sure to have a map to lookup the index of a node.
+  * Build right child first before the left child unlike in the preorder and inorder problem.
+
+[LeetCode link](https://leetcode.com/problems/construct-binary-tree-from-string/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def buildTree(self, inorder: List[int], postorder: List[int]) -> TreeNode:
+        if not postorder:
+            return
+        
+        nodeToIndexMap = { nodeVal: index for index, nodeVal in enumerate(inorder) }
+        postOrderIndex = len(postorder) - 1
+
+        def _buildTree(leftInorderIndex, rightInorderIndex):
+            if leftInorderIndex == rightInorderIndex:
+                return None
+            
+            nonlocal postOrderIndex, nodeToIndexMap
+            root = TreeNode(postorder[postOrderIndex])
+            rootInorderIndex = nodeToIndexMap[ postorder[postOrderIndex] ]
+            
+            postOrderIndex -= 1
+            
+            root.right = _buildTree(rootInorderIndex + 1, rightInorderIndex)
+            root.left = _buildTree(leftInorderIndex, rootInorderIndex)
+
+            return root
+
+        return _buildTree(0, len(inorder))
+```
+
+</details>
+
+## 34.) Construct Binary Search Tree from Preorder Traversal
+
+Return the root node of a binary search tree that matches the given preorder traversal.
+
+(Recall that a binary search tree is a binary tree where for every node, any descendant of node.left has a value < node.val, and any descendant of node.right has a value > node.val.  Also recall that a preorder traversal displays the value of the node first, then traverses node.left, then traverses node.right.)
+
+It's guaranteed that for the given test cases there is always possible to find a binary search tree with the given requirements.
+
+**Questions to ask**
+- Duplicates nodes in the tree?
+- Left child strictly less than parent and converse?
+
+**Hint:**
+* First element in preorder list is the root.
+* Leverage BST property i.e. _node.left.val < node.val < node.right.val_. Starting from root with (-inf, inf) as the left and right ranges, traverse down the preorder list until the BST property doesn't satisfy.
+
+[LeetCode link](https://leetcode.com/problems/construct-binary-search-tree-from-preorder-traversal/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def bstFromPreorder(self, preorder: List[int]) -> TreeNode:
+        if not preorder:
+            return None
+        
+        size = len(preorder)
+        index = 0
+        
+        def buildTree(leftRange, rightRange):
+            nonlocal size, preorder, index
+
+            if index >= size:
+                return None
+            
+            currentVal = preorder[index]
+            if currentVal < leftRange or currentVal > rightRange:
+                return None
+            
+            root = TreeNode(currentVal)
+            index += 1
+            
+            root.left = buildTree(leftRange, currentVal - 1)
+            root.right = buildTree(currentVal + 1, rightRange)
+            return root
+
+        return buildTree(-math.inf, math.inf)
+```
+
+</details>
+
+## 35.) Construct Binary Tree from Preorder and Postorder Traversal
+
+Return any binary tree that matches the given preorder and postorder traversals.
+
+Values in the traversals pre and post are distinct positive integers.
+
+**Questions to ask**
+
+**Test Cases to consider**
+
+**Hint:**
+* Note: From a preorder and post order traversal, only a unique full binary tree can be constructed nor a binary tree.
+* Partition the array into left and right subtree based on where the current preorder node is within the post order list.
+*
+
+[LeetCode link](https://leetcode.com/problems/construct-binary-tree-from-preorder-and-postorder-traversal/solution/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def constructFromPrePost(self, pre: List[int], post: List[int]) -> TreeNode:
+        if not pre:
+            return None
+
+        nodeToIndexMap = { node: index for index, node in enumerate(post) }
+        def make(i0, i1, N):
+            if N == 0: return None
+            root = TreeNode(pre[i0])
+
+            if N == 1: return root
+
+            nonlocal nodeToIndexMap
+            L = nodeToIndexMap[ pre[i0+1] ] - i1 + 1 
+
+            root.left = make(i0 + 1, i1, L)
+            root.right = make(i0 + L + 1, i1 + L, N - 1 - L)
+            return root
+
+        return make(0, 0, len(pre))
+```
+
+</details>
+
+## 36.) Find Bottom Left Tree Value
+
+Given a binary tree, find the leftmost value in the last row of the tree.
+
+**Questions to ask**
+- What should we return when the tree is null?
+- Is it okay to return the right most element at the last depth of the tree?
+
+**Test Cases to consider**
+- Empty Tree
+
+**Hint:**
+* Do a BFS and keep updating the answer with the first element at each depth. Finally, return it.
+
+[LeetCode link](https://leetcode.com/problems/find-bottom-left-tree-value/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+from collections import deque
+class Solution:
+    def findBottomLeftValue(self, root: TreeNode) -> int:
+        if not root:
+            return -1
+        
+        queue = deque([root])
+        bottomLeftVal = None
+        
+        while queue:
+            size = len(queue)
+
+            for i in range(size):
+                node = queue.popleft()
+                if i == 0:
+                    bottomLeftVal = node.val
+
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+            
+            
+        return bottomLeftVal
+```
+
+</details>
+
+## 37.) Closest Binary Search Tree Value
+Given a non-empty binary search tree and a target value, find the value in the BST that is closest to the target.
+
+**Note:**
+- Given target value is a floating point.
+- You are guaranteed to have only one unique value in the BST that is closest to the target.
+
+**Questions to ask**
+- Distinct nodes?
+
+**Test Cases to consider**
+
+**Hint:**
+* 
+
+[LeetCode link](Closest Binary Search Tree Value)
+
+<details>
+<summary>Click here to see code</summary>
+
+## Approach 1: O(N) time
+
+```python
+    def closestValue(self, root: TreeNode, target: float) -> int:
+        if not root:
+            return None
+        
+        closestVal, closestDiff = None, math.inf
+        
+        def dfs(node):
+            if not node:
+                return None
+
+            nonlocal closestVal, closestDiff
+            diff = abs(target - node.val)
+
+            if diff < closestDiff:
+                closestVal = node.val
+                closestDiff = diff
+
+            closestVal 
+            if node.left:
+                dfs(node.left)
+            if node.right:
+                dfs(node.right)
+            
+        dfs(root)
+        return closestVal
+```
+
+## Approach 2: O(H) time
+
+```python
+    def closestValue(self, root: TreeNode, target: float) -> int:
+        if not root:
+            return None
+        closestVal = root.val
+        t = root
+        while t:
+            closestVal = min(closestVal, t.val, key = lambda x: abs(target - x))
+            t = t.left if target < t.val  else t.right
+
+        return closestVal
+```
+
+</details>
+
 # Template:
 
-## .) 
+## 1.) Question label
 
+Question text
+
+**Questions to ask**
+
+**Test Cases to consider**
 
 **Hint:**
 * 

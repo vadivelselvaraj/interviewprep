@@ -99,6 +99,14 @@ hai
 if not aList:
     ...
 ```
+- Find index of an element in a list
+```python
+>>> a = [1,2,3,3,4,5,6]
+>>> a.index(3)
+2
+>>> a.index(4)
+4
+```
 # Dictionary
 
 - Iterate keys and values
@@ -115,6 +123,10 @@ del dictObject[key_to_delete]
 nodeMap = defaultdict(list)
 nodeMap[1].append(23)
 ```
+
+## Heap
+
+
 # Errors
 - __TypeError:__ Raised when a function or operation is applied to an object of an incorrect type.
 - __ValueError:__ Raised when a function gets an argument of correct type but improper value.
@@ -146,3 +158,10 @@ finally:
 - **__ge__(self, other):** To get called on comparison using >= operator.
 
 Others [here](https://www.tutorialsteacher.com/python/magic-methods-in-python).
+
+
+# Tricks
+- To find the minimum of two values but based on a function, use the below.
+```python
+min(pred, root.val, key = lambda x: abs(target - x))
+```

@@ -56,3 +56,16 @@ A full binary tree (sometimes referred to as a proper or plane binary tree) is a
 ### Perfect Binary Tree
 A perfect binary tree is a binary tree in which all interior nodes have two children and all leaves have the same depth or same level.
 
+
+## Tree construction from traversals
+A unique tree can be constructed from inorder and { preorder, postorder } traversals but not from just preorder and postorder traversals.
+
+For instance, considered the left and right skewed trees below where the postorder and preorder for these two trees are the same.
+
+<img src='https://image.slidesharecdn.com/trees-110611091544-phpapp01/95/trees-5-728.jpg?cb=1307783910' />
+
+__preorder__:_[A,B,C]_
+__postorder__:_[C,B,A]_
+
+
+However, a unique full binary tree can be constructed from a preorder and postorder traversals.
