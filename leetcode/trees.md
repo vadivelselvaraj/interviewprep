@@ -1850,8 +1850,7 @@ Given a non-empty binary search tree and a target value, find the value in the B
             if diff < closestDiff:
                 closestVal = node.val
                 closestDiff = diff
-
-            closestVal 
+ 
             if node.left:
                 dfs(node.left)
             if node.right:
@@ -1877,6 +1876,242 @@ Given a non-empty binary search tree and a target value, find the value in the B
 ```
 
 </details>
+
+
+## 38.) Sum of Nodes with Even-Valued Grandparent
+
+Given a binary tree, return the sum of values of nodes with even-valued grandparent.  (A grandparent of a node is the parent of its parent, if it exists.)
+
+If there are no nodes with an even-valued grandparent, return 0.
+Question text
+
+### Example 1:
+<img src="https://assets.leetcode.com/uploads/2019/07/24/1473_ex1.png">
+
+**Input**: root = [6,7,8,2,7,1,3,9,null,1,4,null,null,null,5]
+
+**Output**: 18
+
+**Explanation**: The red nodes are the nodes with even-value grandparent while the blue nodes are the even-value grandparents.
+
+**Questions to ask**
+
+**Test Cases to consider**
+
+**Hint:**
+* Do a BFS or a DFS passing around the parent and the grand parent. For each iteration, make the current node as parent and the current node's parent as grandparent.
+
+[LeetCode link](https://leetcode.com/problems/sum-of-nodes-with-even-valued-grandparent/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+from collections import deque
+class Solution:
+    def sumEvenGrandparent(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+    
+        result = 0
+        
+        queue = deque([(root, None, None)])
+        while queue:
+            levelSize = len(queue)
+            
+            for _ in range(levelSize):
+                node, isParentEvenValued, isGParentEvenValued = queue.popleft()
+
+                if isGParentEvenValued:
+                    result += node.val
+
+                currentGrandParentEvenValued = isParentEvenValued
+                currentParentEvenValued = True if node.val % 2 == 0 else False
+
+                if node.left:
+                    queue.append((node.left, currentParentEvenValued,currentGrandParentEvenValued))
+                if node.right:
+                    queue.append((node.right, currentParentEvenValued,currentGrandParentEvenValued))
+
+        return result
+```
+
+</details>
+
+## 39.) Smallest Subtree with all the Deepest Nodes
+
+Given a binary tree rooted at root, the depth of each node is the shortest distance to the root.
+
+A node is deepest if it has the largest depth possible among any node in the entire tree.
+
+The subtree of a node is that node, plus the set of all descendants of that node.
+
+Return the node with the largest depth such that it contains all the deepest nodes in its subtree.
+
+### Example 1:
+
+**Input:** `[3,5,1,6,2,0,8,null,null,7,4]`
+
+**Output:** `2`
+
+<img src="https://s3-lc-upload.s3.amazonaws.com/uploads/2018/07/01/sketch1.png">
+
+### Example 2:
+
+**Input:** `[1,2,3,4]`
+
+**Output:** `4`
+
+### Example 3:
+
+**Input:** `[1,2,3,null,4]`
+
+**Output:** `4`
+
+**Questions to ask**
+- distinct valued tree?
+
+**Test Cases to consider**
+- `[1,2,3,null,4]` should return `4` and not `2` as `2` is the subtree with largest depth that also contains `2`.
+- `[1,2,3,4]` should return `4`.
+
+**Hint:**
+* Do a bottom up approach and do the below.
+    * Pass on the left or right node that has the max depth at each level.
+    * If both the left and right nodes are at same depth, only then pass the parent node.
+
+[LeetCode link](https://leetcode.com/problems/smallest-subtree-with-all-the-deepest-nodes)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def subtreeWithAllDeepest(self, root: TreeNode) -> TreeNode:
+        if not root:
+            return root
+    
+        def _helper(node: TreeNode) -> (TreeNode, int):
+            if not node:
+                return (None, 0)
+            
+            leftMaxDepthNode, leftMaxDepth = _helper(node.left)
+            rightMaxDepthNode, rightMaxDepth = _helper(node.right)
+            
+            if leftMaxDepth > rightMaxDepth:
+                return (leftMaxDepthNode, leftMaxDepth + 1)
+            elif leftMaxDepth < rightMaxDepth:
+                return (rightMaxDepthNode, rightMaxDepth + 1)
+            return (node, leftMaxDepth + 1)
+            
+            
+        return _helper(root)[0]
+```
+
+</details>
+
+## 40.) Lowest Common Ancestor of a Binary Tree
+
+Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
+
+Given the following binary tree:  root = [3,5,1,6,2,0,8,null,null,7,4]
+
+<img src="https://assets.leetcode.com/uploads/2018/12/14/binarytree.png">
+
+### Example 1:
+**Input:** `root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1`
+
+**Output:** `3`
+
+**Explanation:** The LCA of nodes 5 and 1 is 3.
+### Example 2:
+
+**Input:** `root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4`
+
+**Output:** `5`
+
+**Explanation:** The LCA of nodes 5 and 4 is 5, since a node can be a descendant of itself according to the LCA definition.
+ 
+### Note:
+
+All of the nodes' values will be unique.
+p and q are different and both values will exist in the binary tree.
+
+**Questions to ask**
+- A node is a descendant of itself. i.e. `p=6, p=6` should return `6` as the LCA.
+**Test Cases to consider**
+- Left/Right skewed tree having both the target nodes.
+
+**Hint:**
+* Do a bottom up approach returning `(num_matched_target_nodes, ancestor)` at each stage. Return the node iff 
+
+[LeetCode link](https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/)
+
+<details>
+<summary>Click here to see code</summary>
+
+## Approach 1:
+
+```python
+class Solution:
+    def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+        if not root:
+            return root
+        
+        def _helper(node, x, y):
+            if not node:
+                return (0, None)
+            
+            leftMatchedCount, leftAncestor = _helper(node.left, x, y)
+            if leftMatchedCount == 2:
+                return (leftMatchedCount, leftAncestor)
+
+            rightMatchedCount, rightAncestor = _helper(node.right, x, y)
+            if rightMatchedCount == 2:
+                return (rightMatchedCount, rightAncestor)
+
+            currentCount = leftMatchedCount + rightMatchedCount + (node == p) + (node == q)
+            
+            return (currentCount, node if currentCount == 2 else None)
+            
+            
+        return _helper(root, p, q)[1]
+```
+An alternate using set
+```python
+def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -> 'TreeNode':
+
+        result = None
+
+        def traversal(node_root):
+            nonlocal result
+
+            if not node_root:
+                return set()
+
+            tree_left = traversal(node_root.left)
+            tree_right = traversal(node_root.right)
+
+            node_all = {node_root.val} | tree_left | tree_right
+            if p.val in node_all and q.val in node_all and not result:
+                result = node_root
+
+            return node_all
+
+        traversal(root)
+        return result
+```
+
+## Approach 2:
+
+```python
+
+```
+
+</details>
+
 
 # Template:
 

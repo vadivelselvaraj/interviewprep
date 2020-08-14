@@ -45,16 +45,26 @@ for ch in reversed( range( 0, len(string) ) ):
 "aeioa".replace("a", "d")
 ```
 
-- Check for digit
+- Check for alphabets, digits
 
 ```python
-Character.isDigit(ch)
+"0".isdigit()
+"abc".isalpha()
 ```
+
 - Concatenate strings
 ```python
 >>> p+="2"
 >>> p
 '1->2'
+```
+
+- Split a string into list
+```python
+>>> "abc 23 45 65".split(" ")
+['abc', '23', '45', '65']
+>>> "abc 23 45 65".split(" ", 1)
+['abc', '23 45 65']
 ```
 
 # List
@@ -85,6 +95,7 @@ Character.isDigit(ch)
 >>> sorted(a)
 [(0, 2), (0, 3), (2, 1)]
 ```
+__Note:__ To do in-place sort, call `list.sort()`, otherwise use `sorted(list)`
 - Reverse a list
 ```python
 >>> for i in reversed(['hai', 'bye', 'cde']):
@@ -124,8 +135,35 @@ nodeMap = defaultdict(list)
 nodeMap[1].append(23)
 ```
 
+# OrderedDict:
+`OrderedDict` is a linked list mashed up with hash map(equivalent to `LinkedHashMap` in Java).
+
+
 ## Heap
 
+## Custom Sort
+- Sort the array based on the second element in the tuple
+```python
+def sortSecond(val): 
+    return val[1]  
+  
+# list1 to demonstrate the use of sorting  
+# using using second key  
+list1 = [(1, 2), (3, 3), (1, 1)] 
+  
+# sorts the array in ascending according to  
+# second element 
+list1.sort(key = sortSecond)
+```
+- Sort multiple attributes
+```python
+a = [('a', 15),('d', 34),('a', 10),('d', 23),('e', 2)]
+>>> a.sort()
+[('a', 10), ('a', 15), ('d', 23), ('d', 34), ('e', 2)]
+>>> sorted(a, key=lambda x: (x[1], x[0]))
+[('e', 2), ('a', 10), ('a', 15), ('d', 23), ('d', 34)]
+```
+- Refer `Reorder data log files` problem [here](./arrays.md) for an advanced custom sort.
 
 # Errors
 - __TypeError:__ Raised when a function or operation is applied to an object of an incorrect type.
@@ -164,4 +202,21 @@ Others [here](https://www.tutorialsteacher.com/python/magic-methods-in-python).
 - To find the minimum of two values but based on a function, use the below.
 ```python
 min(pred, root.val, key = lambda x: abs(target - x))
+```
+- Swap two elements in a list or vars without the use of a temporary var
+```python
+a[i], a[j] = a[j], a[i]
+a, b = b, a
+```
+- Count the number of matches between an item and a group of items
+```python
+>>> (1, 2).count(3)
+0
+>>> ('ab', 'b').count('ab')
+1
+```
+- Adding boolean values
+```python
+>>> False + True + True
+2
 ```
