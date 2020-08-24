@@ -140,6 +140,15 @@ nodeMap[1].append(23)
 
 
 ## Heap
+- Converting an array to a heap
+```python
+from heapq import heappop, heappush, heapify
+l = [3,5,9,1,2,10]
+heapify(l)
+```
+- See the max
+
+Leetcode problems on heap [here](https://leetcode.com/tag/heap/).
 
 ## Custom Sort
 - Sort the array based on the second element in the tuple
@@ -214,9 +223,18 @@ a, b = b, a
 0
 >>> ('ab', 'b').count('ab')
 1
+>>> ['ab', 'b', 'abc', 'ab'].count('ab')
+2
 ```
 - Adding boolean values
 ```python
 >>> False + True + True
 2
+```
+- Get the frequency of chars in a string or items in a list
+```python
+>>> Counter("abbxxxxxxxyyy")
+Counter({'x': 7, 'y': 3, 'b': 2, 'a': 1})
+>>> Counter([1,1,2,3,2,4,5,6])
+Counter({1: 2, 2: 2, 3: 1, 4: 1, 5: 1, 6: 1})
 ```

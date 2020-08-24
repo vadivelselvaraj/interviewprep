@@ -33,6 +33,8 @@
 
 ## 2.) Post Order traversal of a nary tree
 *Hint:* Traverse the root node only after traversing the children using a single stack.
+
+[LeetCode link](https://leetcode.com/problems/binary-tree-postorder-traversal)
 <details>
 <summary>Click here to see code</summary>
 
@@ -61,37 +63,40 @@ def postorder(self, root: 'Node') -> List[int]:
 </details> 
 
 
-## 3.) Pre Order traversal of a n-ary tree
-*Hint:* Traverse the root node only after traversing the children using a single stack.
+## 3.) Pre Order traversal of a binary tree
+*Hint:* Same code as postorder but throw rightChild, leftChild and then the root node into the stack.
+
+[LeetCode link](https://leetcode.com/problems/binary-tree-preorder-traversal)
 <details>
 <summary>Click here to see code</summary>
 
 ```python
-def preorder(self, root: 'Node') -> List[int]:
-	result = []
+def preorderTraversal(self, root: TreeNode) -> List[int]:
+    if not root:
+        return []
 
-	# Base Case
-	if not root:
-		return result
+    result = []
+    
+    stack = [(root, False)]
+    while stack:
+        node, subtreeTraversed = stack.pop()
+        if subtreeTraversed:
+            result.append(node.val)
+        else:
+            if node.right:
+                stack.append((node.right, False))
+            if node.left:
+                stack.append((node.left, False))
 
-	stack = [(root, False)]
-	while len(stack) > 0:
-		current, childrenTraversed = stack.pop()
-		if current:
-			if childrenTraversed:
-				result.append(current.val)
-			else:
-				for child in current.children[::-1]:
-					stack.append((child, False))
-				stack.append((current, True))
-
-	return result
+            stack.append((node, True))
+    
+    return result
 ```
 
 </details> 
 
 ## 4.) Pre Order traversal of a n-ary tree
-*Hint:* Traverse the root node only after traversing the children using a single stack.
+*Hint:* Same code as postorder but throw rightChild, leftChild and then the root node into the stack.
 <details>
 <summary>Click here to see code</summary>
 
@@ -2104,10 +2109,235 @@ def lowestCommonAncestor(self, root: 'TreeNode', p: 'TreeNode', q: 'TreeNode') -
         return result
 ```
 
-## Approach 2:
+## Approach 2: Using parent pointers
 
 ```python
+class Solution:
 
+    def lowestCommonAncestor(self, root, p, q):
+        """
+        :type root: TreeNode
+        :type p: TreeNode
+        :type q: TreeNode
+        :rtype: TreeNode
+        """
+
+        # Stack for tree traversal
+        stack = [root]
+
+        # Dictionary for parent pointers
+        parent = {root: None}
+
+        # Iterate until we find both the nodes p and q
+        while p not in parent or q not in parent:
+
+            node = stack.pop()
+
+            # While traversing the tree, keep saving the parent pointers.
+            if node.left:
+                parent[node.left] = node
+                stack.append(node.left)
+            if node.right:
+                parent[node.right] = node
+                stack.append(node.right)
+
+        # Ancestors set() for node p.
+        ancestors = set()
+
+        # Process all ancestors for node p using parent pointers.
+        while p:
+            ancestors.add(p)
+            p = parent[p]
+
+        # The first ancestor of q which appears in
+        # p's ancestor set() is their lowest common ancestor.
+        while q not in ancestors:
+            q = parent[q]
+        return q
+```
+
+```python
+def lca(node0: BinaryTreeNode,
+        node1: BinaryTreeNode) -> Optional[BinaryTreeNode]:
+    def get_depth(node):
+        depth = 0
+        while node.parent:
+            depth += 1
+            node = node.parent
+        return depth
+
+    depth0, depth1 = map(get_depth, (node0, node1))
+    # Makes node0 as the deeper node in order to simplify the code.
+    if depth1 > depth0:
+        node0, node1 = node1, node0
+
+    # Ascends from the deeper node.
+    depth_diff = abs(depth0 - depth1)
+    while depth_diff:
+        node0 = node0.parent
+        depth_diff -= 1
+
+    # Now ascends both nodes until we reach the LCA.
+    while node0 is not node1:
+        node0, node1 = node0.parent, node1.parent
+    return node0
+```
+
+</details>
+
+## 41.) Recover Binary Search Tree
+
+Two elements of a binary search tree (BST) are swapped by mistake.
+
+Recover the tree without changing its structure.
+
+### Example 1:
+```
+Input: [1,3,null,null,2]
+
+   1
+  /
+ 3
+  \
+   2
+
+Output: [3,1,null,null,2]
+
+   3
+  /
+ 1
+  \
+   2
+```   
+### Example 2:
+```
+Input: [3,1,4,null,null,2]
+
+  3
+ / \
+1   4
+   /
+  2
+
+Output: [2,1,4,null,null,3]
+
+  2
+ / \
+1   4
+   /
+  3
+```
+### Follow up:
+
+A solution using O(n) space is pretty straight forward.
+Could you devise a constant space solution?
+
+**Questions to ask**
+
+**Test Cases to consider**
+- swapped elements are consecutive. Example 2: [1, 3, 2, 4]
+- swapped elements are not consecutive. Example 1: [3, 2, 1]
+
+**Hint:**
+* Do an inorder traversal, keeping track of the predecessor and then find the two swapped elements that can be consecutive/non-consecutive. Swap the found elements.
+
+[LeetCode link](https://leetcode.com/problems/recover-binary-search-tree/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def recoverTree(self, root: TreeNode) -> None:
+        """
+        Do not return anything, modify root in-place instead.
+        """
+        if not root:
+            return
+
+        x, y, predecessor = None, None, None
+        
+        def findSwappedNodes(node: TreeNode):
+            if not node:
+                return
+
+            nonlocal x, y, predecessor
+            if node.left:
+                findSwappedNodes(node.left)
+            
+            if predecessor and node.val < predecessor.val:
+                x = node
+                if y is None:
+                    y = predecessor
+                else:
+                    return
+
+            predecessor = node
+
+            if node.right:
+                findSwappedNodes(node.right)
+        
+        findSwappedNodes(root)
+        x.val, y.val = y.val, x.val
+```
+
+## Approach 2: Using Morris Inorder Traversal(constant space)
+
+```python
+class Solution:
+    def recoverTree(self, root):
+        """
+        :type root: TreeNode
+        :rtype: void Do not return anything, modify root in-place instead.
+        """
+        # predecessor is a Morris predecessor. 
+        # In the 'loop' cases it could be equal to the node itself predecessor == root.
+        # pred is a 'true' predecessor, 
+        # the previous node in the inorder traversal.
+        x = y = predecessor = pred = None
+        
+        while root:
+            # If there is a left child
+            # then compute the predecessor.
+            # If there is no link predecessor.right = root --> set it.
+            # If there is a link predecessor.right = root --> break it.
+            if root.left:       
+                # Predecessor node is one step left 
+                # and then right till you can.
+                predecessor = root.left
+                while predecessor.right and predecessor.right != root:
+                    predecessor = predecessor.right
+ 
+                # set link predecessor.right = root
+                # and go to explore left subtree
+                if predecessor.right is None:
+                    predecessor.right = root
+                    root = root.left
+                # break link predecessor.right = root
+                # link is broken : time to change subtree and go right
+                else:
+                    # check for the swapped nodes
+                    if pred and root.val < pred.val:
+                        y = root
+                        if x is None:
+                            x = pred 
+                    pred = root
+                    
+                    predecessor.right = None
+                    root = root.right
+            # If there is no left child
+            # then just go right.
+            else:
+                # check for the swapped nodes
+                if pred and root.val < pred.val:
+                    y = root
+                    if x is None:
+                        x = pred 
+                pred = root
+                
+                root = root.right
+        
+        x.val, y.val = y.val, x.val
 ```
 
 </details>

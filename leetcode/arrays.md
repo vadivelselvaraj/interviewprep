@@ -60,6 +60,10 @@ __Output:__ `[[1,5]]`
 
 __Explanation:__ Intervals `[1,4]` and `[4,5]` are considered overlapping.
 
+### Follow up
+
+How do you add intervals and merge them for a large stream of intervals? (Facebook Follow-up Question)
+
 **Hint:**
 * __Approach 1:__ Sort the array. Then do a pass to merge the intervals as we move forward as per the invariant `If a[i] can't merge with a[i-1], then a[i+1] cannot merge with a[i-1] due to the sort.` To merge `a[i]` with `a[i-1]`, use `a[i-1][end] = max( a[i-1][end], a[i][end] )` eg: `[1,4], [2,3]` & `[1,3], [2,4]`. Time Complexity: _O(nlogn)_
 * __Approach 2:__ Interval Trees.
@@ -513,6 +517,213 @@ class Solution:
 
 </details>
 
+
+## 8.) Next Permutation
+
+Implement *next* permutation, which rearranges numbers into the lexicographically next greater permutation of numbers.
+
+If such arrangement is not possible, it must rearrange it as the lowest possible order (ie, sorted in ascending order).
+
+The replacement must be in-place and use only constant extra memory.
+
+Here are some examples. Inputs are in the left-hand column and its corresponding outputs are in the right-hand column.
+
+`1,2,3 → 1,3,2`
+`3,2,1 → 1,2,3`
+`1,1,5 → 1,5,1`
+
+**Hint:**
+* Find the first number from the right that is less than it's successive number i.e `a[i] < a[i+1]`. Swap `a[i]` with the number that is first higher than it starting from the right as well.
+* Now reverse the array starting from `a[i+1]` till the end of the array. This would yield the next highest permutation as well as handle the case of `3 2 1` and transform it to `1 2 3`.
+
+<img src="https://leetcode.com/media/original_images/31_Next_Permutation.gif">
+
+[LeetCode link](https://leetcode.com/problems/next-permutation/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def nextPermutation(self, nums: List[int]) -> None:
+        """
+        Do not return anything, modify nums in-place instead.
+        """
+        if not nums:
+            return
+        
+        i = len(nums) - 2
+        while i >= 0 and nums[i] >= nums[i + 1]:
+            i -= 1
+        
+        if i >= 0:
+            j = len(nums) - 1
+            while j >= 0 and nums[j] <= nums[i]:
+                j -= 1
+
+            nums[i], nums[j] = nums[j], nums[i]
+
+        def reverse(arr, start):
+            i, j = start, len(arr) - 1
+
+            while i < j:
+                arr[i], arr[j] = arr[j], arr[i]
+                i += 1
+                j -= 1
+        
+        reverse(nums, i + 1)
+```
+
+</details>
+
+## 9.) 3Sum
+
+Given an array _nums_ of n integers, are there elements a, b, c in nums such that _a + b + c = 0_? Find all unique triplets in the array which gives the sum of zero.
+
+### Note:
+
+The solution set must not contain duplicate triplets.
+
+### Example:
+
+Given array `nums = [-1, 0, 1, 2, -1, -4]`,
+
+A solution set is:
+```
+[
+  [-1, 0, 1],
+  [-1, -1, 2]
+]
+```
+**Hint:**
+* Sort the array. Loop through index 0, say i. For each pass, use two pointers; one starting from i + 1 and the other from the end of the array incrementing/decrementing them as necessary.
+
+[LeetCode link](https://leetcode.com/problems/3sum/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+class Solution:
+    def threeSum(self, nums: List[int]) -> List[List[int]]:
+        if not nums or len(nums) < 3:
+            return []
+
+        result = []
+        
+        nums.sort()
+        for i in range(len(nums) - 2):
+            if nums[i] > 0:
+                break
+
+            if i != 0 and nums[i-1] == nums[i]:
+                continue
+            
+            low, high = i + 1, len(nums) - 1
+            
+            while low < high:
+                sumTriplet = nums[i] + nums[low] + nums[high]
+                if sumTriplet == 0:
+                    result.append([nums[i], nums[low], nums[high]])
+                    low += 1
+                    high -= 1
+                    while low < high and nums[low] == nums[low - 1]:
+                        low += 1
+                elif sumTriplet < 0:
+                    low += 1
+                elif sumTriplet > 0:
+                    high -= 1
+
+        return result
+```
+
+</details>
+
+## 10.) Search a 2D Matrix
+
+Write an efficient algorithm that searches for a value in an m x n matrix. This matrix has the following properties:
+
+Integers in each row are sorted from left to right.
+The first integer of each row is greater than the last integer of the previous row.
+
+### Example 1:
+```
+Input:
+matrix = [
+  [1,   3,  5,  7],
+  [10, 11, 16, 20],
+  [23, 30, 34, 50]
+]
+target = 3
+Output: true
+```
+### Example 2:
+```
+Input:
+matrix = [
+  [1,   3,  5,  7],
+  [10, 11, 16, 20],
+  [23, 30, 34, 50]
+]
+target = 13
+Output: false
+```
+
+**Hint:**
+* Consider the entire matrix as a sorted array starting at 0 and ending at m*n-1. Row, Column can be determined using the math `[index // colSize][index % colSize]`. Now, do a binary search for this. Time Complexity: `O(log(mn))`.
+
+[LeetCode link](https://leetcode.com/problems/search-a-2d-matrix/)
+
+<details>
+<summary>Click here to see code</summary>
+
+### Approach 1: Binary search on entire matrix
+```python
+class Solution:
+    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+        m = len(matrix)
+        if m == 0:
+            return False
+        n = len(matrix[0])
+        
+        # binary search
+        left, right = 0, m * n - 1
+        while left <= right:
+                pivot_idx = (left + right) // 2
+                pivot_element = matrix[pivot_idx // n][pivot_idx % n]
+                if target == pivot_element:
+                    return True
+                else:
+                    if target < pivot_element:
+                        right = pivot_idx - 1
+                    else:
+                        left = pivot_idx + 1
+        return False
+```
+
+### Approach 2: O(m+n) search
+```python
+class Solution:
+    def searchMatrix(self, matrix: List[List[int]], target: int) -> bool:
+        if not matrix:
+            return False
+        
+        rowSize, colSize = len(matrix), len(matrix[0])
+        i, j = rowSize - 1, 0
+        
+        while i >= 0 and j < colSize:
+            if matrix[i][j] == target:
+                return True
+            elif matrix[i][j] < target:
+                j += 1
+            else:                
+                i -= 1
+
+        return False
+```
+
+</details>
+
 # Template:
 
 Use this template to create new problems
@@ -523,7 +734,7 @@ Use this template to create new problems
 **Hint:**
 * 
 
-[LeetCode link]()
+[LeetCode link](https://leetcode.com/problems/)
 
 <details>
 <summary>Click here to see code</summary>

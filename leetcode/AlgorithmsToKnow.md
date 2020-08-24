@@ -35,3 +35,14 @@ Higher dimensions (d>1):
 - __Interval tree__ - O(n logn) preprocessing time, O(k+(logn)^d) query time, O(n logn) space
 - __Range tree__ - O(n(logn)^d) preprocessing time, O(k+(logn)^d) query time, O(n(logn)^(d-1))) space
 - __Binary Indexed tree__ - O(n(logn)^d) preprocessing time, O((logn)^d) query time, O(n(logn)^d) space
+
+# Shuffle algorithms
+
+## Fisher Yates Shuffle algorithm
+
+[Wikipedia link](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle)
+```python
+for i in range(len(self.array)-1):
+    swap_idx = random.randrange(i, len(self.array))
+    self.array[i], self.array[swap_idx] = self.array[swap_idx], self.array[i]
+```
