@@ -2343,6 +2343,61 @@ class Solution:
 </details>
 
 
+## 42.) Range Sum BST
+
+Given the root node of a binary search tree, return the sum of values of all nodes with value between L and R (inclusive).
+
+The binary search tree is guaranteed to have unique values.
+
+## Example 1:
+```
+Input: root = [10,5,15,3,7,null,18], L = 7, R = 15
+Output: 32
+```
+## Example 2:
+```
+Input: root = [10,5,15,3,7,13,18,1,null,6], L = 6, R = 10
+Output: 23
+```
+
+### Note:
+
+- The number of nodes in the tree is at most 10000.
+- The final answer is guaranteed to be less than 2^31.
+
+**Questions to ask**
+- Sum within range?
+**Test Cases to consider**
+
+**Hint:**
+* 
+
+[LeetCode link](https://leetcode.com/problems/range-sum-of-bst/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+def rangeSumBST(self, root: TreeNode, L: int, R: int) -> int:
+    if not root:
+        return 0
+    
+    stack = [root]
+    result = 0
+    while stack:
+        node = stack.pop()
+        if L <= node.val <= R:
+            result += node.val
+        if node.right:
+            stack.append(node.right)
+        if node.left:
+            stack.append(node.left) 
+    
+    return result
+```
+
+</details>
+
 # Template:
 
 ## 1.) Question label

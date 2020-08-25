@@ -136,8 +136,7 @@ nodeMap[1].append(23)
 ```
 
 # OrderedDict:
-`OrderedDict` is a linked list mashed up with hash map(equivalent to `LinkedHashMap` in Java).
-
+`OrderedDict` is a linked list mashed up with hash map(equivalent to `LinkedHashMap` in Java). Offers `O(1)` insert, delete and update time complexities.
 
 ## Heap
 - Converting an array to a heap
