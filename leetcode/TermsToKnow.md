@@ -69,3 +69,46 @@ __postorder__:_[C,B,A]_
 
 
 However, a unique full binary tree can be constructed from a preorder and postorder traversals.
+
+
+# Arrays
+
+## Substrings
+There are `n*(n+1)/2)` substrings in a string of length, `n`. 
+```python
+def subArray(arr, n): 
+  
+    # Pick starting point 
+    for i in range(0,n): 
+  
+        # Pick ending point 
+        for j in range(i,n): 
+  
+            # Print subarray between 
+            # current starting 
+            # and ending points 
+            for k in range(i,j+1): 
+                print (arr[k],end=" ") 
+  
+            print ("\n",end="") 
+```
+## Subsequences
+There are `2^n` subsequences for a string of length, `n` including the empty `''` one.
+```python
+def printSubsequences(arr, n) : 
+  
+    # Number of subsequences is (2**n -1) 
+    opsize = math.pow(2, n) 
+  
+    # Run from counter 000..1 to 111..1 
+    for counter in range( 1, (int)(opsize)) : 
+        for j in range(0, n) : 
+              
+            # Check if jth bit in the counter 
+            # is set If set then print jth  
+            # element from arr[]  
+            if (counter & (1<<j)) : 
+                print( arr[j], end =" ") 
+          
+        print()
+```

@@ -724,6 +724,368 @@ class Solution:
 
 </details>
 
+## 11.) Longest Continuous Subarray With Absolute Diff Less Than or Equal to Limit
+
+Given an array of integers nums and an integer limit, return the size of the longest non-empty subarray such that the absolute difference between any two elements of this subarray is less than or equal to limit.
+
+## Example 1:
+```
+Input: nums = [8,2,4,7], limit = 4
+Output: 2 
+Explanation: All subarrays are: 
+[8] with maximum absolute diff |8-8| = 0 <= 4.
+[8,2] with maximum absolute diff |8-2| = 6 > 4. 
+[8,2,4] with maximum absolute diff |8-2| = 6 > 4.
+[8,2,4,7] with maximum absolute diff |8-2| = 6 > 4.
+[2] with maximum absolute diff |2-2| = 0 <= 4.
+[2,4] with maximum absolute diff |2-4| = 2 <= 4.
+[2,4,7] with maximum absolute diff |2-7| = 5 > 4.
+[4] with maximum absolute diff |4-4| = 0 <= 4.
+[4,7] with maximum absolute diff |4-7| = 3 <= 4.
+[7] with maximum absolute diff |7-7| = 0 <= 4. 
+Therefore, the size of the longest subarray is 2.
+```
+## Example 2:
+```
+Input: nums = [10,1,2,4,7,2], limit = 5
+Output: 4 
+Explanation: The subarray [2,4,7,2] is the longest since the maximum absolute diff is |2-7| = 5 <= 5.
+```
+## Example 3:
+```
+Input: nums = [4,2,2,2,4,4,2,2], limit = 0
+Output: 3
+``` 
+## Constraints:
+
+- 1 <= nums.length <= 10^5
+- 1 <= nums[i] <= 10^9
+- 0 <= limit <= 10^9
+
+**Hint:**
+* For each subarray, find min/max efficiently, determine if the subarray satisfies the limit constraint.
+* Use heap or montonized queues to extract max and min
+
+[LeetCode link](https://leetcode.com/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/)
+
+<details>
+<summary>Click here to see code</summary>
+
+## Approach 1: `O(n)` time complexity and `O(1)` space complexity
+```python
+    def longestSubarray(self, nums: List[int], limit: int) -> int:
+        if not nums:
+            return 0
+
+        start = 0
+        maxLength, count = 1, 0
+        minItem, maxItem = nums[0], nums[0]
+        
+        for end in range(len(nums)):
+            if nums[end] > maxItem:
+                maxItem = nums[end]
+            if nums[end] < minItem:
+                minItem = nums[end]
+            
+            if maxItem - minItem <= limit:
+                count += 1
+                maxLength = max(maxLength, count)
+            else:
+                # update min, max to the new index
+                maxItem, minItem = nums[end], nums[end]
+                t, count = end - 1, 1
+                # Traverse left until the previously counted index to find the first occurence that doesn't satisfy the limit constraint
+                while t >= start \
+                    and abs(maxItem-nums[t]) <= limit \
+                    and abs(minItem-nums[t]) <= limit:
+                    if nums[t] > maxItem:
+                        maxItem = nums[t]
+                    if nums[t] < minItem:
+                        minItem = nums[t]
+                    count += 1
+                    t -= 1
+                maxLength = max(maxLength, count)
+                # update start to denote the new index where the count should start getting updated
+                start = end + 1
+
+        return maxLength 
+```
+
+## Approach 2: Strictly increasing and decreasing Monotonic Queues: `O(n)` time complexity and `O(n)` space complexity
+```python
+    def longestSubarray(self, A, limit):
+        maxd = collections.deque()
+        mind = collections.deque()
+        i = 0
+        for a in A:
+            while len(maxd) and a > maxd[-1]: maxd.pop()
+            while len(mind) and a < mind[-1]: mind.pop()
+            maxd.append(a)
+            mind.append(a)
+            if maxd[0] - mind[0] > limit:
+                if maxd[0] == A[i]: maxd.popleft()
+                if mind[0] == A[i]: mind.popleft()
+                i += 1
+        return len(A) - i
+```
+
+## Approach 3: Min and Max Heap queue `O(nlogn)` time complexity and `o(n)` space complexity
+```python
+    def longestSubarray(self, A, limit):
+        maxq, minq = [], []
+        res = i = 0
+        for j, a in enumerate(A):
+            heapq.heappush(maxq, [-a, j])
+            heapq.heappush(minq, [a, j])
+            while -maxq[0][0] - minq[0][0] > limit:
+                i = min(maxq[0][1], minq[0][1]) + 1
+                while maxq[0][1] < i: heapq.heappop(maxq)
+                while minq[0][1] < i: heapq.heappop(minq)
+            res = max(res, j - i + 1)
+        return res
+```
+</details>
+
+## 12.) Sliding Window Maximum
+Given an array nums, there is a sliding window of size k which is moving from the very left of the array to the very right. You can only see the k numbers in the window. Each time the sliding window moves right by one position. Return the max sliding window.
+
+### Follow up:
+Could you solve it in linear time?
+
+### Example:
+```
+Input: nums = [1,3,-1,-3,5,3,6,7], and k = 3
+Output: [3,3,5,5,6,7] 
+Explanation: 
+
+Window position                Max
+---------------               -----
+[1  3  -1] -3  5  3  6  7       3
+ 1 [3  -1  -3] 5  3  6  7       3
+ 1  3 [-1  -3  5] 3  6  7       5
+ 1  3  -1 [-3  5  3] 6  7       5
+ 1  3  -1  -3 [5  3  6] 7       6
+ 1  3  -1  -3  5 [3  6  7]      7
+``` 
+
+### Constraints:
+
+- 1 <= nums.length <= 10^5
+- -10^4 <= nums[i] <= 10^4
+- 1 <= k <= nums.length
+
+**Hint:**
+* Use monotonic queue to solve it in `O(n)`.
+* Q: How to pop elements from both sides of the window in O(1) time?
+  * A: Double-ended queue (deque)
+* Q. How to always grab the maximum element in O(1) time?
+  * A. Keep a version of the window sorted descending (using deque). That way, the left element is always the maximum. If we want the 2nd maximum element, we can just pop the first one.
+* Q. How can we sync the fixed sliding window size with a queue that is always changing in size?
+  * A. Compare the left (first) element of the queue with the left boundary element of the window. If we detect that they are the same, then remove that element as it is out-of-bounds.
+
+[LeetCode link](https://leetcode.com/problems/sliding-window-maximum/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+def maxSlidingWindow(self, nums: List[int], k: int) -> List[int]:
+    if not nums:
+        return []
+    
+    result = []
+    maxQueue = deque()
+
+    for index, num in enumerate(nums):
+        # if the queue's left element is out of bounds, pop it to maintain size
+        if index - k >= 0 and nums[index-k] == maxQueue[0]:
+            maxQueue.popleft()
+        # ensure array is DECREASING by right-popping elements that are smaller
+        while maxQueue and maxQueue[-1] < num:
+            maxQueue.pop()
+
+        # add the element itself
+        maxQueue.append(num)
+         # append to output list if we have full window
+        if index >= k-1:
+            result.append(maxQueue[0])
+        
+    return result
+```
+
+</details>
+
+## 13.) Max Stack
+Design a max stack that supports push, pop, top, peekMax and popMax.
+
+* push(x) -- Push element x onto stack.
+* pop() -- Remove the element on top of the stack and return it.
+* top() -- Get the element on the top.
+* peekMax() -- Retrieve the maximum element in the stack.
+* popMax() -- Retrieve the maximum element in the stack, and remove it. If you find more than one maximum elements, only remove the top-most one.
+### Example 1:
+```
+MaxStack stack = new MaxStack();
+stack.push(5); 
+stack.push(1);
+stack.push(5);
+stack.top(); -> 5
+stack.popMax(); -> 5
+stack.top(); -> 1
+stack.peekMax(); -> 5
+stack.pop(); -> 1
+stack.top(); -> 5
+```
+Note:
+- -1e7 <= x <= 1e7
+- Number of operations won't exceed 10000.
+- The last four operations won't be called when stack is empty.
+
+**Hint:**
+* 
+
+[LeetCode link](https://leetcode.com/problems/)
+
+<details>
+<summary>Click here to see code</summary>
+
+## Approach 1: `O(n)` time complexity for `popMax()` and `O(1)` for the rest
+```python
+StackElement = namedtuple('StackElement', ('element', 'maxVal'))
+class MaxStack:
+
+    def __init__(self):
+        """
+        initialize your data structure here.
+        """
+        self.items = []
+
+    def empty(self):
+        return len(self.items) == 0
+
+    def push(self, x: int) -> None:
+        self.items.append(StackElement(
+            x,
+            x if self.empty() else max(x, self.peekMax())
+        )) 
+
+    def pop(self) -> int:
+        if not self.empty():
+            return self.items.pop().element
+
+    def top(self) -> int:
+        if not self.empty():
+            return self.items[-1].element
+
+    def peekMax(self) -> int:
+        if not self.empty():
+            return self.items[-1].maxVal
+
+    def popMax(self) -> int:
+        if not self.empty():
+            maxElement = self.peekMax()
+            temp = []
+            # Add elements before max onto a temp stack
+            while self.top() != maxElement:
+                temp.append(self.pop())
+
+            # Remove max element
+            self.pop()
+            
+            # Add the elements back into the stack
+            for item in temp[::-1]:
+                self.push(item)
+
+            return maxElement
+
+# Your MaxStack object will be instantiated and called as such:
+# obj = MaxStack()
+# obj.push(x)
+# param_2 = obj.pop()
+# param_3 = obj.top()
+# param_4 = obj.peekMax()
+# param_5 = obj.popMax()
+```
+
+## Approach 2: `O(logn)` time complexity for `popMax()` using stack + heap + set
+
+Uses a heap for efficient finding of the max, and a stack for efficient finding of the most recent. Each new item was added onto both of these data structures.
+
+I also assigned a decreasing ID to each added value so that they were all uniquely indentifible, as the same value could be added more than once, and we need to know which were more recently added. The reason for making them decreasing was so that they could be used to ensure the more recent items came up higher on the heap in the case of ties.
+
+On pop operations, I directly popped from the data structure the operation was on, and then put the identifier into a set called soft_deleted. An identifier in soft_deleted represents an item that has been popped from one data structure, but not yet located and removed in the other. This avoids doing linear searches to try and find items that need deleting. I noticed a few sample solutions used 2 sets for this purpose, however I don't feel this is necessary. It's fine for them to share, and with O(1) removal from a set, we're not getting performance gains by seperating them.
+
+I defined a private function called _clean_up which checks the tops of the data structures and iteratively removes any soft deleted items from them. When a soft deleted item is removed, the identifier is also removed from soft_deleted as it no longer needs to be there, due to now being deleted from both sets.
+
+So, we need to ensure that before we do a peek or a pop, that a clean up operation has been run to ensure that the tops of our data structures are clean. An interesting question is where this should be done. I decided to do it after a pop, so that then we wouldn't need to call it on peeks, although I need to think more about whether or not this is optimal. It's important to clean both data structures, because either could be "dirty" from the pop operation. On the one that had the pop done, the pop might have exposed a soft deleted element. On the other, it's possible that the element we just popped was also the top on it.
+
+For the rather little test cases given, we can speed it up by not removing stuff from the soft deleted set. But if we have very large amounts of data going in and out, then in essence it'd be unbounded and thus a nasty memory leak. For this reason, I think it's better design to be doing those deletes.
+
+Inorder to scale better and reduce memory wastage, we could do a "full clean" whenever the soft deleted set got above a certain size. This would involve rebuilding the stack and the heap with only the non deleted items.
+
+```python
+class MaxStack:
+
+    def __init__(self):
+        self.soft_deleted = set()
+        self.max_heap = []
+        self.recency_stack = []
+        self.next_id = 0
+        
+    def push(self, x: int) -> None:
+        heapq.heappush(self.max_heap, (-x, self.next_id))
+        self.recency_stack.append((x, self.next_id))
+        self.next_id -= 1
+
+    def _clean_up(self):
+        while self.recency_stack and self.recency_stack[-1][1] in self.soft_deleted:
+            self.soft_deleted.remove(self.recency_stack.pop()[1])
+        while self.max_heap and self.max_heap[0][1] in self.soft_deleted:
+            self.soft_deleted.remove(heapq.heappop(self.max_heap)[1])
+    
+    def pop(self) -> int:
+        entry_to_return = self.recency_stack.pop()
+        self.soft_deleted.add(entry_to_return[1])
+        self._clean_up()
+        return entry_to_return[0]
+        
+    def top(self) -> int:
+        return self.recency_stack[-1][0]
+
+    def peekMax(self) -> int:
+        return -self.max_heap[0][0]
+        
+    def popMax(self) -> int:
+        value, time = heapq.heappop(self.max_heap)
+        self.soft_deleted.add(time)
+        self._clean_up()
+        return value * -1
+```
+
+</details>
+
+```python
+import bisect
+class MyCalendarTwo(object):
+
+    def __init__(self):
+        self.calendar = []
+
+    def book(self, start, end):
+        bisect.insort(self.calendar, (start, 1))
+        bisect.insort(self.calendar, (end, -1))
+        
+        bookings = 0
+        for time, freq in self.calendar:
+            bookings += freq
+            if bookings == 3:
+                self.calendar.pop(bisect.bisect_left(self.calendar, (start, 1)))
+                self.calendar.pop(bisect.bisect_left(self.calendar, (end, -1)))
+                return False
+        
+        return True
+```
+
 # Template:
 
 Use this template to create new problems

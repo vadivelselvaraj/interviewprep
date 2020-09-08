@@ -2398,6 +2398,181 @@ def rangeSumBST(self, root: TreeNode, L: int, R: int) -> int:
 
 </details>
 
+## 43.) Binary Tree Cameras
+
+Given a binary tree, we install cameras on the nodes of the tree. 
+
+Each camera at a node can monitor its parent, itself, and its immediate children.
+
+Calculate the minimum number of cameras needed to monitor all nodes of the tree.
+
+### Example 1:
+<img src="https://assets.leetcode.com/uploads/2018/12/29/bst_cameras_01.png">
+
+```
+Input: [0,0,null,0,0]
+Output: 1
+Explanation: One camera is enough to monitor all nodes if placed as shown.
+```
+
+### Example 2:
+<img src="https://assets.leetcode.com/uploads/2018/12/29/bst_cameras_02.png">
+
+```
+Input: [0,0,null,0,null,0,null,null,0]
+Output: 2
+Explanation: At least two cameras are needed to monitor all nodes of the tree. The above image shows one of the valid configurations of camera placement.
+```
+### Note:
+
+- The number of nodes in the given tree will be in the range [1, 1000].
+- Every node has value 0.
+
+**Questions to ask**
+
+**Test Cases to consider**
+
+**Hint:**
+* Do a postorder DFS. Pass the parent one of the below values.
+  * 1: Requires monitoring
+  * 2: Has a camera
+  * 3: Doesn't require monitoring and doesn't have a camera
+
+[LeetCode link](https://leetcode.com/problems/binary-tree-cameras)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+    def minCameraCover(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        minCover = 0
+        
+        # 1: Requires monitoring
+        # 2: Has a camera
+        # 3: Doesn't require monitoring and doesn't have a camera
+        def dfs(node):
+            nonlocal minCover
+            
+            # Null node doesn't require monitoring
+            if not node:
+                return 3
+            
+            L = dfs(node.left)
+            R = dfs(node.right)
+            
+            # if either one of the children requires monitoring, install camera
+            # at this node
+            if L == 1 or R == 1:
+                minCover += 1
+                return 2
+
+            # if either one of the children already has a camera, don't install
+            # a camera but let the parent know.
+            if L == 2 or R == 2:
+                return 3
+
+            # if the node is root, install the camera
+            if node == root:
+                minCover += 1
+            else:
+                # tell parent that it requires monitoring
+                return 1
+            
+        dfs(root)
+        return minCover
+```
+
+</details>
+
+## 44.) Distribute coins in a binary tree
+
+Given the root of a binary tree with N nodes, each node in the tree has node.val coins, and there are N coins total.
+
+In one move, we may choose two adjacent nodes and move one coin from one node to another.  (The move may be from parent to child, or from child to parent.)
+
+Return the number of moves required to make every node have exactly one coin.
+
+
+### Example 1:
+
+<img src="https://assets.leetcode.com/uploads/2019/01/18/tree1.png">
+
+```
+Input: [3,0,0]
+Output: 2
+Explanation: From the root of the tree, we move one coin to its left child, and one coin to its right child.
+```
+
+### Example 2:
+
+<img src="https://assets.leetcode.com/uploads/2019/01/18/tree2.png">
+
+```
+Input: [0,3,0]
+Output: 3
+Explanation: From the left child of the root, we move two coins to the root [taking two moves].  Then, we move one coin from the root of the tree to the right child.
+```
+
+### Example 3:
+<img src="https://assets.leetcode.com/uploads/2019/01/18/tree3.png">
+
+```
+Input: [1,0,2]
+Output: 2
+```
+### Example 4:
+<img src="https://assets.leetcode.com/uploads/2019/01/18/tree4.png">
+
+```
+Input: [1,0,0,null,3]
+Output: 4
+```
+
+### Note:
+
+- 1<= N <= 100
+- 0 <= node.val <= N
+
+**Questions to ask**
+
+**Test Cases to consider**
+
+**Hint:**
+* Use a bottom up approach and pass the number of excessive coins from the leaf to the parent. While doing so, count the number of coins that can be transferred from a given node to its children and vice versa & accumulate this to a var.
+
+[LeetCode link](https://leetcode.com/problems/distribute-coins-in-binary-tree/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+    def distributeCoins(self, root: TreeNode) -> int:
+        if not root:
+            return 0
+        
+        numberOfMoves = 0
+        
+        def dfs(node):
+            nonlocal numberOfMoves
+            if not node:
+                return 0
+            L = dfs(node.left)
+            R = dfs(node.right)
+
+            # 
+            numberOfMoves += abs(L) + abs(R)
+
+            # return the excess coins from this node to the parent
+            return node.val + L + R - 1
+            
+        dfs(root)
+        return numberOfMoves
+```
+
+</details>
+
 # Template:
 
 ## 1.) Question label
@@ -2419,4 +2594,4 @@ Question text
 ```python
 ```
 
-</details>
+</details> 

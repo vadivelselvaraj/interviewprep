@@ -138,7 +138,7 @@ nodeMap[1].append(23)
 # OrderedDict:
 `OrderedDict` is a linked list mashed up with hash map(equivalent to `LinkedHashMap` in Java). Offers `O(1)` insert, delete and update time complexities.
 
-## Heap
+# Heap
 - Converting an array to a heap
 ```python
 from heapq import heappop, heappush, heapify
@@ -149,7 +149,16 @@ heapify(l)
 
 Leetcode problems on heap [here](https://leetcode.com/tag/heap/).
 
-## Custom Sort
+# bisect(Java's TreeMap alternative)
+- insort(Add elements in sorted order)
+```python
+>>> a = [30,40,50,60,70]
+>>> bisect.insort(a, 33)
+>>> a
+[30, 33, 40, 50, 60, 70]
+```
+- 
+# Custom Sort
 - Sort the array based on the second element in the tuple
 ```python
 def sortSecond(val): 
