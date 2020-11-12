@@ -2573,6 +2573,117 @@ Output: 4
 
 </details>
 
+## 45.) Binary Tree Right Side View
+
+Given a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.
+
+**Questions to ask**
+
+**Test Cases to consider**
+
+**Hint:**
+
+[LeetCode link](https://leetcode.com/problems/binary-tree-right-side-view/)
+
+<details>
+<summary>Click here to see code</summary>
+
+```python
+    def rightSideView(self, root: TreeNode) -> List[int]:
+        if not root:
+            return []
+        
+        right_side_nodes = []
+        queue = deque([root])
+        
+        while queue:
+            level_size = len(queue)
+            
+            for index in range(level_size):
+                node = queue.popleft()
+                if index == level_size - 1:
+                    right_side_nodes.append(node.val)
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+
+        return right_side_nodes
+```
+Time: O(n) n: no. of nodes in tree
+Space: O(D) Diameter of the tree; D = N/2 for a complete binary tree
+
+Using DFS
+```
+class Solution:
+    def rightSideView(self, root: TreeNode) -> List[int]:
+        if root is None:
+            return []
+        
+        rightside = []
+        
+        def helper(node: TreeNode, level: int) -> None:
+            if level == len(rightside):
+                rightside.append(node.val)
+            for child in [node.right, node.left]:
+                if child:
+                    helper(child, level + 1)
+                
+        helper(root, 0)
+        return rightside
+```
+</details> 
+
+## 46.) Binary Tree Zigzag Level Order Traversal
+
+Given a binary tree, return the zigzag level order traversal of its nodes' values. (ie, from left to right, then right to left for the next level and alternate between).
+
+
+**Questions to ask**
+
+**Test Cases to consider**
+
+**Hint:**
+* 
+
+[LeetCode link](https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/
+<details>
+<summary>Click here to see code</summary>
+
+```python
+    def zigzagLevelOrder(self, root: TreeNode) -> List[List[int]]:
+        if not root:
+            return []
+        
+        traversed_nodes = []
+        queue, level_nodes = deque([root, None]), deque()
+        turn = 1
+
+        while queue:
+            node = queue.popleft()
+            
+            if node:
+                if turn:
+                    level_nodes.append(node.val)
+                else:
+                    level_nodes.appendleft(node.val)
+
+                if node.left:
+                    queue.append(node.left)
+                if node.right:
+                    queue.append(node.right)
+            else:
+                traversed_nodes.append(level_nodes)
+                if queue:
+                    queue.append(None)
+                level_nodes = deque()
+                turn ^= 1
+        
+        return traversed_nodes
+```
+
+</details> 
+
 # Template:
 
 ## 1.) Question label

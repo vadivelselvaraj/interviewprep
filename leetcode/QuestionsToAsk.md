@@ -12,3 +12,8 @@
 
 # Hashmap
 - Are the range of characters fixed?
+
+# Linked list
+- Single or double?
+- Is it cycle free?
+

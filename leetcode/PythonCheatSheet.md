@@ -135,6 +135,18 @@ nodeMap = defaultdict(list)
 nodeMap[1].append(23)
 ```
 
+# Set
+- Add elements to set
+```python
+a = set()
+a.add(2)
+```
+- Find if element exists in a set
+```python
+if 2 in a:
+    print('hai')
+```
+
 # OrderedDict:
 `OrderedDict` is a linked list mashed up with hash map(equivalent to `LinkedHashMap` in Java). Offers `O(1)` insert, delete and update time complexities.
 
@@ -245,4 +257,16 @@ a, b = b, a
 Counter({'x': 7, 'y': 3, 'b': 2, 'a': 1})
 >>> Counter([1,1,2,3,2,4,5,6])
 Counter({1: 2, 2: 2, 3: 1, 4: 1, 5: 1, 6: 1})
+```
+- Iterate Counter object
+```python
+>>> for k, v in Counter("abc").items():
+        print(f"{k}:{v}")
+```
+_Note:_ Don't use enumerate(Counter("abc")) as it treats it as an array and produces k, v as (0, a).
+- Get element with max frequency
+```
+def majorityElement(self, nums):
+    counts = collections.Counter(nums)
+    return max(counts.keys(), key=counts.get)
 ```
